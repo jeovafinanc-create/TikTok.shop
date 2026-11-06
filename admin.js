@@ -1,6 +1,6 @@
 
 document.addEventListener("DOMContentLoaded", () => {
-  const db = window.supabaseClient;
+  const getDB = () => window.supabaseClient || null;
 
   const loginPanel = document.getElementById("login-panel");
   const adminPanel = document.getElementById("admin-panel");
@@ -21,8 +21,10 @@ document.addEventListener("DOMContentLoaded", () => {
     })[char]);
 
   async function checkSession() {
+    const db = getDB();
+
     if (!db) {
-      loginMsg.textContent = "Configure a conexão com o Supabase.";
+      loginMsg.textContent = "Supabase não inicializado. Verifique a configuração.";
       return;
     }
 
@@ -43,8 +45,10 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("login-form").addEventListener("submit", async e => {
     e.preventDefault();
 
+    const db = getDB();
+
     if (!db) {
-      loginMsg.textContent = "Configure o Supabase.";
+      loginMsg.textContent = "Supabase não inicializado.";
       return;
     }
 
@@ -53,10 +57,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const email = document.getElementById("login-email").value.trim();
     const password = document.getElementById("login-password").value;
 
-    const { error } = await db.auth.signInWithPassword({
-      email,
-      password
-    });
+    const { error } = await db.auth.signInWithPassword({ email, password });
 
     if (error) {
       loginMsg.textContent = error.message;
@@ -68,6 +69,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   document.getElementById("logout-button").addEventListener("click", async () => {
+    const db = getDB();
     if (db) await db.auth.signOut();
 
     adminPanel.classList.add("hidden");
@@ -75,7 +77,13 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   async function loadProducts() {
+    const db = getDB();
     const root = document.getElementById("admin-products");
+
+    if (!db) {
+      root.textContent = "Supabase não inicializado.";
+      return;
+    }
 
     const { data, error } = await db
       .from("products")
@@ -95,29 +103,19 @@ document.addEventListener("DOMContentLoaded", () => {
     root.innerHTML = `
       <table>
         <thead>
-          <tr>
-            <th>Produto</th>
-            <th>Preço</th>
-            <th>Mídias</th>
-            <th>Ativo</th>
-          </tr>
+          <tr><th>Produto</th><th>Preço</th><th>Mídias</th><th>Ativo</th></tr>
         </thead>
         <tbody>
-          ${data.map(p => {
-            const mediaCount = Array.isArray(p.media) ? p.media.length : 0;
-
-            return `
-              <tr>
-                <td>${escapeHTML(p.name)}</td>
-                <td>${Number(p.price).toLocaleString("pt-BR", {
-                  style: "currency",
-                  currency: "BRL"
-                })}</td>
-                <td>${mediaCount || "Cadastro antigo"}</td>
-                <td>${p.active ? "Sim" : "Não"}</td>
-              </tr>
-            `;
-          }).join("")}
+          ${data.map(p => `
+            <tr>
+              <td>${escapeHTML(p.name)}</td>
+              <td>${Number(p.price).toLocaleString("pt-BR", {
+                style: "currency", currency: "BRL"
+              })}</td>
+              <td>${Array.isArray(p.media) && p.media.length ? p.media.length : "Cadastro antigo"}</td>
+              <td>${p.active ? "Sim" : "Não"}</td>
+            </tr>
+          `).join("")}
         </tbody>
       </table>
     `;
@@ -126,8 +124,10 @@ document.addEventListener("DOMContentLoaded", () => {
   productForm.addEventListener("submit", async e => {
     e.preventDefault();
 
+    const db = getDB();
+
     if (!db) {
-      productMsg.textContent = "Configure o Supabase.";
+      productMsg.textContent = "Supabase não inicializado.";
       return;
     }
 
@@ -158,38 +158,21 @@ document.addEventListener("DOMContentLoaded", () => {
         throw new Error("Informe um estoque válido.");
       }
 
-      const selectedFiles = [
-        ...document.getElementById("images").files
-      ];
-
+      const selectedFiles = [...document.getElementById("images").files];
       const media = [];
 
       for (const file of selectedFiles) {
-        const isImage = [
-          "image/jpeg",
-          "image/png",
-          "image/webp"
-        ].includes(file.type);
-
-        const isVideo = [
-          "video/mp4",
-          "video/webm"
-        ].includes(file.type);
+        const isImage = ["image/jpeg", "image/png", "image/webp"].includes(file.type);
+        const isVideo = ["video/mp4", "video/webm"].includes(file.type);
 
         if (!isImage && !isVideo) {
-          throw new Error(
-            `Formato não permitido: ${file.name}. Use JPG, PNG, WEBP, MP4 ou WEBM.`
-          );
+          throw new Error(`Formato não permitido: ${file.name}.`);
         }
 
-        const maxSize = isVideo
-          ? 50 * 1024 * 1024
-          : 10 * 1024 * 1024;
+        const maxSize = isVideo ? 50 * 1024 * 1024 : 10 * 1024 * 1024;
 
         if (file.size > maxSize) {
-          throw new Error(
-            `${file.name} ultrapassa o limite de ${isVideo ? "50 MB" : "10 MB"}.`
-          );
+          throw new Error(`${file.name} ultrapassa o limite permitido.`);
         }
 
         const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
@@ -199,24 +182,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const { error: uploadError } = await db.storage
           .from(BUCKET)
-          .upload(path, file, {
-            upsert: false,
-            contentType: file.type
-          });
+          .upload(path, file, { upsert: false, contentType: file.type });
 
         if (uploadError) throw uploadError;
 
         uploadedPaths.push(path);
 
-        const { data: publicData } = db.storage
-          .from(BUCKET)
-          .getPublicUrl(path);
-
+        const { data: publicData } = db.storage.from(BUCKET).getPublicUrl(path);
         const url = publicData?.publicUrl;
 
-        if (!url) {
-          throw new Error("Não foi possível obter o endereço da mídia.");
-        }
+        if (!url) throw new Error("Não foi possível obter o endereço da mídia.");
 
         media.push({
           type: isImage ? "image" : "video",
@@ -230,39 +205,33 @@ document.addEventListener("DOMContentLoaded", () => {
 
       productMsg.textContent = "Salvando cadastro do produto...";
 
-      const { error: insertError } = await db
-        .from("products")
-        .insert({
-          name,
-          price,
-          description,
-          category,
-          stock,
-          image: firstImage ? firstImage.url : null,
-          media,
-          active: true
-        });
+      const { error: insertError } = await db.from("products").insert({
+        name,
+        price,
+        description,
+        category,
+        stock,
+        image: firstImage ? firstImage.url : null,
+        media,
+        active: true
+      });
 
       if (insertError) throw insertError;
 
       productMsg.textContent = "Produto cadastrado com sucesso!";
       productForm.reset();
-
       await loadProducts();
 
     } catch (error) {
-      if (uploadedPaths.length && db) {
+      if (uploadedPaths.length) {
         const { error: cleanupError } = await db.storage
           .from(BUCKET)
           .remove(uploadedPaths);
 
-        if (cleanupError) {
-          console.error("Não foi possível limpar os arquivos:", cleanupError);
-        }
+        if (cleanupError) console.error("Erro ao limpar arquivos:", cleanupError);
       }
 
-      productMsg.textContent =
-        error.message || "Não foi possível cadastrar o produto.";
+      productMsg.textContent = error.message || "Não foi possível cadastrar o produto.";
 
     } finally {
       saveButton.disabled = false;
