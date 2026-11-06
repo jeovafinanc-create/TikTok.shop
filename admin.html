@@ -1,7 +1,114 @@
-<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Administração | TIKTOK-SHOP</title><link rel="stylesheet" href="style.css"><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase.config.js" defer></script><script src="admin.js" defer></script></head><body>
-<header class="site-header"><a class="brand" href="index.html">TIKTOK-SHOP</a><a href="index.html">Ver loja</a></header>
-<main class="container"><h1 class="page-title">Painel administrativo</h1>
-<section class="panel" id="login-panel"><h2>Acesso administrativo</h2><form id="login-form"><div class="form-group"><label for="login-email">E-mail</label><input class="field" id="login-email" type="email" required></div><div class="form-group"><label for="login-password">Senha</label><input class="field" id="login-password" type="password" required></div><button class="button" type="submit">Entrar</button></form><p id="login-message" aria-live="polite"></p><a href="recuperar-senha.html">Esqueci minha senha</a></section>
-<section class="panel hidden" id="admin-panel"><div class="section-heading"><h2>Cadastrar produto</h2><button id="logout-button" class="button button-dark">Sair</button></div>
-<form id="product-form"><div class="form-grid"><div class="form-group"><label for="name">Nome</label><input class="field" id="name" required></div><div class="form-group"><label for="price">Preço (R$)</label><input class="field" id="price" type="number" min="0" step="0.01" required></div><div class="form-group"><label for="category">Categoria</label><input class="field" id="category"></div><div class="form-group"><label for="stock">Estoque</label><input class="field" id="stock" type="number" min="0" value="0"></div></div><div class="form-group"><label for="description">Descrição</label><textarea class="field" id="description" rows="3"></textarea></div><div class="form-group"><label for="images">Fotos do produto</label><input class="field" id="images" type="file" accept="image/jpeg,image/png,image/webp" multiple></div><button class="button" type="submit">Cadastrar produto</button></form><p id="product-message" aria-live="polite"></p><h2 style="margin:24px 0 10px">Produtos cadastrados</h2><div id="admin-products" class="table-wrap"></div></section>
-</main></body></html>
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#ffffff">
+  <title>Administração | TIKTOK-SHOP</title>
+
+  <link rel="stylesheet" href="style.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.config.js" defer></script>
+  <script src="admin.js" defer></script>
+</head>
+
+<body>
+<header class="site-header">
+  <a class="brand" href="index.html">TIKTOK-SHOP</a>
+  <a href="index.html">Ver loja</a>
+</header>
+
+<main class="container">
+  <h1 class="page-title">Painel administrativo</h1>
+
+  <section class="panel" id="login-panel">
+    <h2>Acesso administrativo</h2>
+
+    <form id="login-form">
+      <div class="form-group">
+        <label for="login-email">E-mail</label>
+        <input class="field" id="login-email" type="email" required>
+      </div>
+
+      <div class="form-group">
+        <label for="login-password">Senha</label>
+        <input class="field" id="login-password" type="password" required>
+      </div>
+
+      <button class="button" type="submit">Entrar</button>
+    </form>
+
+    <p id="login-message" aria-live="polite"></p>
+    <a href="recuperar-senha.html">Esqueci minha senha</a>
+  </section>
+
+  <section class="panel hidden" id="admin-panel">
+    <div class="section-heading">
+      <h2>Cadastrar produto</h2>
+      <button id="logout-button" class="button button-dark" type="button">
+        Sair
+      </button>
+    </div>
+
+    <form id="product-form">
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="name">Nome do produto</label>
+          <input class="field" id="name" required>
+        </div>
+
+        <div class="form-group">
+          <label for="price">Preço (R$)</label>
+          <input class="field" id="price" type="number"
+                 min="0.01" step="0.01" required>
+        </div>
+
+        <div class="form-group">
+          <label for="category">Categoria</label>
+          <input class="field" id="category">
+        </div>
+
+        <div class="form-group">
+          <label for="stock">Estoque</label>
+          <input class="field" id="stock" type="number"
+                 min="0" value="0">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="description">Descrição</label>
+        <textarea class="field" id="description" rows="3"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="images">Fotos e vídeos do produto</label>
+
+        <input
+          class="field"
+          id="images"
+          type="file"
+          accept="image/jpeg,image/png,image/webp,video/mp4,video/webm"
+          multiple
+        >
+
+        <small class="muted">
+          Você pode selecionar várias fotos, vídeos ou combinar os dois.
+          Fotos: JPG, PNG e WEBP. Vídeos: MP4 e WEBM.
+        </small>
+      </div>
+
+      <button class="button" id="save-product" type="submit">
+        Cadastrar produto
+      </button>
+    </form>
+
+    <p id="product-message" aria-live="polite"></p>
+
+    <h2 style="margin:24px 0 10px">Produtos cadastrados</h2>
+    <div id="admin-products" class="table-wrap"></div>
+  </section>
+</main>
+</body>
+</html>
