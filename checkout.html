@@ -1,3 +1,93 @@
-<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Checkout | TIKTOK-SHOP</title><link rel="stylesheet" href="style.css"><script src="app.js" defer></script><script src="checkout.js" defer></script></head><body>
-<header class="site-header"><a class="brand" href="index.html">TIKTOK-SHOP</a><a href="sacola.html">Voltar à sacola</a></header>
-<main class="container"><h1 class="page-title">Finalizar pedido</h1><div class="panel"><p class="notice">Ambiente demonstrativo. Não informe dados de cartão neste protótipo. O pagamento real exige integração de servidor segura.</p><form id="checkout-form"><div class="form-grid"><div class="form-group"><label for="name">Nome completo</label><input class="field" id="name" required autocomplete="name"></div><div class="form-group"><label for="email">E-mail</label><input class="field" id="email" type="email" required autocomplete="email"></div><div class="form-group"><label for="phone">Telefone</label><input class="field" id="phone" required autocomplete="tel"></div><div class="form-group"><label for="cep">CEP</label><input class="field" id="cep" required autocomplete="postal-code"></div><div class="form-group"><label for="address">Endereço</label><input class="field" id="address" required autocomplete="street-address"></div><div class="form-group"><label for="number">Número/complemento</label><input class="field" id="number" required></div></div><button class="button button-block" type="submit">Continuar</button></form><p id="checkout-message" aria-live="polite"></p></div></main></body></html>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101014">
+  <title>Finalizar pedido | TikTok</title>
+
+  <link rel="stylesheet" href="style.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.config.js" defer></script>
+  <script src="checkout.js" defer></script>
+</head>
+
+<body>
+  <header class="site-header">
+    <a class="brand" href="index.html">TikTok</a>
+    <a class="cart-link" href="sacola.html">Voltar à sacola</a>
+  </header>
+
+  <main class="container">
+    <h1 class="page-title">Finalizar pedido</h1>
+
+    <section class="panel">
+      <h2>Seus dados</h2>
+
+      <form id="checkout-form">
+        <label for="customer-name">Nome completo</label>
+        <input id="customer-name" name="name" type="text"
+          placeholder="Digite seu nome completo" required>
+
+        <label for="customer-email">E-mail</label>
+        <input id="customer-email" name="email" type="email"
+          placeholder="seuemail@exemplo.com" required>
+
+        <label for="customer-phone">WhatsApp</label>
+        <input id="customer-phone" name="phone" type="tel"
+          placeholder="(11) 99999-9999" required>
+
+        <h2>Endereço de entrega</h2>
+
+        <label for="customer-cep">CEP</label>
+        <input id="customer-cep" name="cep" type="text"
+          inputmode="numeric" placeholder="00000-000" required>
+
+        <label for="customer-address">Rua e avenida</label>
+        <input id="customer-address" name="address" type="text"
+          placeholder="Nome da rua ou avenida" required>
+
+        <label for="customer-number">Número</label>
+        <input id="customer-number" name="number" type="text"
+          placeholder="Número da residência" required>
+
+        <label for="customer-complement">Complemento</label>
+        <input id="customer-complement" name="complement" type="text"
+          placeholder="Apartamento, bloco, casa...">
+
+        <label for="customer-neighborhood">Bairro</label>
+        <input id="customer-neighborhood" name="neighborhood" type="text"
+          placeholder="Seu bairro" required>
+
+        <label for="customer-city">Cidade</label>
+        <input id="customer-city" name="city" type="text"
+          placeholder="Sua cidade" required>
+
+        <label for="customer-state">Estado</label>
+        <input id="customer-state" name="state" type="text"
+          placeholder="UF" maxlength="2" required>
+
+        <div id="checkout-summary" class="checkout-summary">
+          Carregando resumo do pedido...
+        </div>
+
+        <p class="notice">
+          Confira seus dados antes de continuar. O pedido ainda não estará
+          pago nesta etapa.
+        </p>
+
+        <button class="button button-block" type="submit">
+          CONTINUAR PARA PAGAMENTO
+        </button>
+
+        <p id="checkout-message" class="notice" aria-live="polite"></p>
+      </form>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    TIKTOK-SHOP — Protótipo acadêmico independente.
+  </footer>
+</body>
+</html>
