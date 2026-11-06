@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Loja independente de produtos e ofertas.">
+  <title>TIKTOK-SHOP | Loja</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.config.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="index.html">TIKTOK-SHOP</a>
+    <form id="search-form" class="search-form">
+      <input id="search-input" type="search" placeholder="Buscar produtos..." aria-label="Buscar produtos">
+      <button class="button button-dark" type="submit">Buscar</button>
+    </form>
+    <a class="cart-link" href="sacola.html">Sacola <span id="cart-count">0</span></a>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <div>
+        <p class="eyebrow">DESCUBRA • COMPARE • ESCOLHA</p>
+        <h1>Encontre seu próximo favorito.</h1>
+        <p>Uma vitrine independente para descobrir produtos e ofertas.</p>
+        <a class="button" href="#produtos">Ver produtos</a>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-heading">
+        <div><p class="eyebrow">VITRINE</p><h2 id="listing-title">Produtos em destaque</h2></div>
+        <span id="product-status" class="muted" aria-live="polite">Carregando produtos...</span>
+      </div>
+      <div id="product-grid" class="product-grid"></div>
+      <div id="empty-state" class="empty-state hidden">Nenhum produto encontrado.</div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>TIKTOK-SHOP — loja independente, sem vínculo com o TikTok.</p>
+    <p>Protótipo: compras e pagamentos só serão reais após configuração e testes.</p>
+  </footer>
+</body>
+</html>
