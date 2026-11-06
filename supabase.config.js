@@ -1,6 +1,7 @@
-() => {
+(() => {
   const SUPABASE_URL = "https://wiryisehatplfwqxnxmp.supabase.co";
 
+  // Cole sua chave pública verdadeira nesta linha.
   const SUPABASE_ANON_KEY = "sb_publishable_cQq5WFaCVeq4OCJSQNHdcg_z1bpFjl3";
 
   if (!window.supabase) {
@@ -8,10 +9,8 @@
     return;
   }
 
-  if (
-    SUPABASE_ANON_KEY === "sb_publishable_cQq5WFaCVeq4OCJSQNHdcg_z1bpFjl3";
-  ) {
-    console.warn("Configure a chave pública do Supabase.");
+  if (SUPABASE_ANON_KEY === "sb_publishable_cQq5WFaCVeq4OCJSQNHdcg_z1bpFjl3") {
+    console.error("Falta configurar a chave pública.");
     window.supabaseClient = null;
     return;
   }
@@ -20,4 +19,6 @@
     SUPABASE_URL,
     SUPABASE_ANON_KEY
   );
+
+  console.log("Supabase conectado!");
 })();
