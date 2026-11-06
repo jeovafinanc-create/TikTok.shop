@@ -4,345 +4,42 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="TIKTOK-SHOP: descubra produtos, ofertas e novidades.">
   <meta name="theme-color" content="#111111">
-
-  <title>TIKTOK-SHOP | Loja</title>
-
+  <title>TIKTOK-SHOP</title>
   <link rel="stylesheet" href="style.css">
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="supabase.config.js" defer></script>
+  <script src="supabase.config.js"></script>
   <script src="app.js" defer></script>
-
-  <style>
-    .hero-carousel {
-      position: relative;
-      width: 100%;
-      overflow: hidden;
-      border-radius: 18px;
-      margin: 24px 0;
-      background: #111;
-      color: white;
-    }
-
-    .hero-track {
-      display: flex;
-      transition: transform .5s ease;
-    }
-
-    .hero-slide {
-      min-width: 100%;
-      min-height: 300px;
-      padding: 45px;
-      display: flex;
-      align-items: center;
-      background-size: cover;
-      background-position: center;
-      position: relative;
-      isolation: isolate;
-    }
-
-    .hero-slide::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(90deg,
-        rgba(0,0,0,.88),
-        rgba(0,0,0,.35));
-      z-index: -1;
-    }
-
-    .hero-slide h1 {
-      font-size: clamp(30px, 5vw, 48px);
-      max-width: 550px;
-      margin: 12px 0;
-    }
-
-    .hero-slide p {
-      font-size: 16px;
-      max-width: 450px;
-    }
-
-    .hero-slide .button {
-      display: inline-block;
-      margin-top: 18px;
-      text-decoration: none;
-    }
-
-    .slide-one {
-      background-image: url("https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1600&q=85");
-    }
-
-    .slide-two {
-      background-image: url("https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=1600&q=85");
-    }
-
-    .slide-three {
-      background-image: url("https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=1600&q=85");
-    }
-
-    .carousel-arrow {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 42px;
-      height: 42px;
-      border: none;
-      border-radius: 50%;
-      background: rgba(255,255,255,.9);
-      color: #111;
-      font-size: 24px;
-      cursor: pointer;
-      z-index: 3;
-    }
-
-    .carousel-prev { left: 14px; }
-    .carousel-next { right: 14px; }
-
-    .carousel-dots {
-      position: absolute;
-      bottom: 18px;
-      left: 0;
-      right: 0;
-      display: flex;
-      justify-content: center;
-      gap: 9px;
-      z-index: 3;
-    }
-
-    .carousel-dot {
-      width: 10px;
-      height: 10px;
-      border: none;
-      border-radius: 50%;
-      background: rgba(255,255,255,.55);
-      cursor: pointer;
-      padding: 0;
-    }
-
-    .carousel-dot.active {
-      width: 26px;
-      border-radius: 10px;
-      background: white;
-    }
-
-    @media (max-width: 600px) {
-      .hero-slide {
-        min-height: 260px;
-        padding: 28px 24px;
-      }
-
-      .hero-slide h1 {
-        font-size: 30px;
-      }
-
-      .carousel-arrow {
-        width: 34px;
-        height: 34px;
-        font-size: 20px;
-      }
-    }
-  </style>
 </head>
 
 <body>
-
   <header class="site-header">
-    <a class="brand" href="index.html">TIKTOK-SHOP</a>
-
-    <form id="search-form" class="search-form">
-      <input
-        id="search-input"
-        type="search"
-        placeholder="Buscar produtos..."
-        aria-label="Buscar produtos"
-      >
-      <button class="button button-dark" type="submit">
-        Buscar
-      </button>
-    </form>
+    <a class="brand" href="index.html">TikTok</a>
 
     <a class="cart-link" href="sacola.html">
-      Sacola <span id="cart-count">0</span>
+      <span>Sacola</span>
+      <span id="cart-count">0</span>
     </a>
   </header>
 
   <main class="container">
-
-    <!-- CARROSSEL PRINCIPAL -->
-    <section class="hero-carousel" aria-label="Ofertas em destaque">
-
-      <div class="hero-track" id="hero-track">
-
-        <article class="hero-slide slide-one">
-          <div>
-            <p class="eyebrow">TIKTOK-SHOP</p>
-            <h1>Descubra seus próximos favoritos.</h1>
-            <p>Explore produtos, novidades e oportunidades especiais.</p>
-            <a class="button" href="#produtos">Comprar agora</a>
-          </div>
-        </article>
-
-        <article class="hero-slide slide-two">
-          <div>
-            <p class="eyebrow">OFERTAS ESPECIAIS</p>
-            <h1>Produtos que combinam com você.</h1>
-            <p>Compare opções e encontre seu próximo produto favorito.</p>
-            <a class="button" href="#produtos">Explorar ofertas</a>
-          </div>
-        </article>
-
-        <article class="hero-slide slide-three">
-          <div>
-            <p class="eyebrow">NOVIDADES</p>
-            <h1>Sempre tem algo novo para descobrir.</h1>
-            <p>Confira nossa seleção de produtos em destaque.</p>
-            <a class="button" href="#produtos">Ver novidades</a>
-          </div>
-        </article>
-
+    <div id="product-detail">
+      <div class="loading">
+        Carregando produto...
       </div>
+    </div>
 
-      <button
-        class="carousel-arrow carousel-prev"
-        id="carousel-prev"
-        type="button"
-        aria-label="Banner anterior"
-      >‹</button>
-
-      <button
-        class="carousel-arrow carousel-next"
-        id="carousel-next"
-        type="button"
-        aria-label="Próximo banner"
-      >›</button>
-
-      <div class="carousel-dots" id="carousel-dots">
-        <button class="carousel-dot active" type="button" aria-label="Banner 1"></button>
-        <button class="carousel-dot" type="button" aria-label="Banner 2"></button>
-        <button class="carousel-dot" type="button" aria-label="Banner 3"></button>
-      </div>
-
+    <section class="description-section">
+      <h2>Descrição do produto</h2>
+      <p id="product-description">
+        Carregando informações...
+      </p>
     </section>
-
-    <!-- VITRINE DE PRODUTOS -->
-    <section class="section" id="produtos">
-
-      <div class="section-heading">
-        <div>
-          <p class="eyebrow">VITRINE</p>
-          <h2 id="listing-title">Produtos em destaque</h2>
-        </div>
-
-        <span
-          id="product-status"
-          class="muted"
-          aria-live="polite"
-        >Carregando produtos...</span>
-      </div>
-
-      <div id="product-grid" class="product-grid"></div>
-
-      <div id="empty-state" class="empty-state hidden">
-        Nenhum produto encontrado.
-      </div>
-
-    </section>
-
   </main>
 
   <footer class="site-footer">
-    <p>TIKTOK-SHOP — loja independente.</p>
+    TIKTOK-SHOP — Protótipo acadêmico independente.
   </footer>
-
-  <!-- CONTROLES DO CARROSSEL -->
-  <script>
-    (() => {
-      const track = document.getElementById("hero-track");
-      const dots = Array.from(
-        document.querySelectorAll(".carousel-dot")
-      );
-
-      const previous = document.getElementById("carousel-prev");
-      const next = document.getElementById("carousel-next");
-
-      const total = dots.length;
-      let current = 0;
-      let timer;
-
-      function showSlide(index) {
-        current = (index + total) % total;
-
-        track.style.transform =
-          `translateX(-${current * 100}%)`;
-
-        dots.forEach((dot, i) => {
-          dot.classList.toggle("active", i === current);
-          dot.setAttribute(
-            "aria-current",
-            i === current ? "true" : "false"
-          );
-        });
-      }
-
-      function startAutoPlay() {
-        clearInterval(timer);
-
-        timer = setInterval(() => {
-          showSlide(current + 1);
-        }, 5000);
-      }
-
-      function restartAutoPlay() {
-        startAutoPlay();
-      }
-
-      previous.addEventListener("click", () => {
-        showSlide(current - 1);
-        restartAutoPlay();
-      });
-
-      next.addEventListener("click", () => {
-        showSlide(current + 1);
-        restartAutoPlay();
-      });
-
-      dots.forEach((dot, index) => {
-        dot.addEventListener("click", () => {
-          showSlide(index);
-          restartAutoPlay();
-        });
-      });
-
-      const carousel = document.querySelector(".hero-carousel");
-
-      carousel.addEventListener("mouseenter", () => {
-        clearInterval(timer);
-      });
-
-      carousel.addEventListener("mouseleave", startAutoPlay);
-
-      let touchStart = 0;
-
-      carousel.addEventListener("touchstart", event => {
-        touchStart = event.touches[0].clientX;
-      }, { passive: true });
-
-      carousel.addEventListener("touchend", event => {
-        const difference =
-          event.changedTouches[0].clientX - touchStart;
-
-        if (Math.abs(difference) > 50) {
-          showSlide(current + (difference < 0 ? 1 : -1));
-          restartAutoPlay();
-        }
-      }, { passive: true });
-
-      showSlide(0);
-      startAutoPlay();
-    })();
-  </script>
-
 </body>
 </html>
