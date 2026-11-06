@@ -1,1 +1,49 @@
-<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pedido | TIKTOK-SHOP</title><link rel="stylesheet" href="style.css"></head><body><header class="site-header"><a class="brand" href="index.html">TIKTOK-SHOP</a></header><main class="container"><h1 class="page-title">Acompanhamento do pedido</h1><div class="panel"><p>O acompanhamento será habilitado após a integração do banco de pedidos e a confirmação do pagamento.</p><a class="button" href="index.html">Voltar à loja</a></div></main></body></html>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101014">
+  <title>Acompanhar pedido | TikTok</title>
+
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.config.js" defer></script>
+  <script src="pedido.js" defer></script>
+</head>
+
+<body>
+  <header class="site-header">
+    <a class="brand" href="index.html">TikTok</a>
+    <a class="cart-link" href="index.html">Voltar à loja</a>
+  </header>
+
+  <main class="container">
+    <section class="panel">
+      <h1 class="page-title">Acompanhe seu pedido</h1>
+
+      <label for="order-number">Número do pedido</label>
+      <input
+        id="order-number"
+        type="text"
+        placeholder="Digite o número do pedido"
+        autocomplete="off"
+      >
+
+      <button id="search-order" class="button button-block" type="button">
+        CONSULTAR PEDIDO
+      </button>
+
+      <div id="order-result" aria-live="polite">
+        <p class="notice">
+          Informe o número do pedido para consultar o andamento.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    TIKTOK-SHOP — Protótipo acadêmico independente.
+  </footer>
+</body>
+</html>
