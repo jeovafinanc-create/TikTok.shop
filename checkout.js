@@ -12,6 +12,15 @@
       currency: "BRL"
     });
 
+  const escapeHTML = value =>
+    String(value ?? "").replace(/[&<>"']/g, char => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;"
+    })[char]);
+
   function getCart() {
     try {
       const cart = JSON.parse(localStorage.getItem(CART_KEY) || "[]");
@@ -40,42 +49,28 @@
       return;
     }
 
-    const total = cart.reduce((sum, item) => {
-      return sum +
-        Number(item.price || 0) *
-        Math.max(1, Number(item.quantity || 1));
-    }, 0);
+    const total = cart.reduce((sum, item) =>
+      sum + Number(item.price || 0) *
+      Math.max(1, Number(item.quantity || 1)), 0
+    );
 
     summary.innerHTML = `
       <h2>Resumo do pedido</h2>
       ${cart.map(item => `
         <p>
-          ${Number(item.quantity || 1)}x
-          ${escapeHTML(item.name)}
+          ${Number(item.quantity || 1)}x ${escapeHTML(item.name)}
           ${item.color ? " — " + escapeHTML(item.color) : ""}
-          <strong>
-            ${money(Number(item.price || 0) * Number(item.quantity || 1))}
-          </strong>
+          <strong>${money(Number(item.price || 0) *
+            Number(item.quantity || 1))}</strong>
         </p>
       `).join("")}
-      <p>Frete: a combinar</p>
-      <h2>Total dos produtos: ${money(total)}</h2>
+      <h2>Total: ${money(total)}</h2>
     `;
   }
 
-  function escapeHTML(value) {
-    return String(value ?? "").replace(/[&<>"']/g, char => ({
-      "&": "&amp;",
-      "<": "&lt;",
-      ">": "&gt;",
-      '"': "&quot;",
-      "'": "&#39;"
-    })[char]);
-  }
-
   function generateOrderNumber() {
-    const random = Math.floor(100000 + Math.random() * 900000);
-    return "TT-" + Date.now() + "-" + random;
+    return "TT-" + Date.now() + "-" +
+      Math.floor(100000 + Math.random() * 900000);
   }
 
   async function submitOrder(event) {
@@ -84,16 +79,17 @@
     const cart = getCart();
 
     if (!cart.length) {
-      showMessage("Sua sacola está vazia. Escolha um produto primeiro.", true);
+      showMessage("Sua sacola está vazia.", true);
       return;
     }
 
     if (!db()) {
-      showMessage("Não foi possível conectar ao sistema. Tente novamente.", true);
+      showMessage("Falha na conexão com o sistema.", true);
       return;
     }
 
     const form = document.getElementById("checkout-form");
+
     if (!form.reportValidity()) return;
 
     const button = form.querySelector('button[type="submit"]');
@@ -101,23 +97,26 @@
     button.textContent = "REGISTRANDO PEDIDO...";
 
     try {
-      const formData = new FormData(form);
+      const values = new FormData(form);
 
-      const name = String(formData.get("name") || "").trim();
-      const email = String(formData.get("email") || "").trim();
-      const phone = String(formData.get("phone") || "").trim();
-      const cep = String(formData.get("cep") || "").trim();
+      const name = String(values.get("name") || "").trim();
+      const email = String(values.get("email") || "").trim();
+      const phone = String(values.get("phone") || "").trim();
+      const cep = String(values.get("cep") || "").trim();
+      const street = String(values.get("address") || "").trim();
+      const number = String(values.get("number") || "").trim();
+      const complement = String(values.get("complement") || "").trim();
+      const neighborhood = String(values.get("neighborhood") || "").trim();
+      const city = String(values.get("city") || "").trim();
+      const state = String(values.get("state") || "").trim().toUpperCase();
 
-      const addressParts = [
-        String(formData.get("address") || "").trim(),
-        "Nº " + String(formData.get("number") || "").trim(),
-        String(formData.get("complement") || "").trim(),
-        String(formData.get("neighborhood") || "").trim(),
-        String(formData.get("city") || "").trim(),
-        String(formData.get("state") || "").trim().toUpperCase()
-      ].filter(Boolean);
-
-      const address = addressParts.join(", ");
+      const address = [
+        street,
+        complement,
+        neighborhood,
+        city,
+        state
+      ].filter(Boolean).join(", ");
 
       const items = cart.map(item => ({
         product_id: item.id,
@@ -142,12 +141,15 @@
         customer_phone: phone,
         customer_cep: cep,
         customer_address: address,
+        customer_number: number,
         items: items,
         subtotal: subtotal,
         shipping: 0,
         total: subtotal,
-        payment_status: "pending",
+        payment_method: "RecargaPay",
         payment_provider: "RecargaPay",
+        payment_status: "pending",
+        status: "pending",
         shipping_status: "awaiting_payment"
       };
 
@@ -159,9 +161,7 @@
 
       if (error) {
         console.error("Erro ao registrar pedido:", error);
-        throw new Error(
-          "Não foi possível registrar o pedido. Verifique a conexão e as permissões da tabela orders."
-        );
+        throw new Error(error.message);
       }
 
       localStorage.setItem(ORDER_KEY, JSON.stringify({
@@ -174,11 +174,15 @@
       localStorage.removeItem(CART_KEY);
 
       window.location.href =
-        "pagamento.html?pedido=" + encodeURIComponent(data.order_number);
+        "pagamento.html?pedido=" +
+        encodeURIComponent(data.order_number);
 
     } catch (error) {
       console.error(error);
-      showMessage(error.message || "Erro ao finalizar o pedido.", true);
+      showMessage(
+        "Não foi possível registrar o pedido: " + error.message,
+        true
+      );
 
       button.disabled = false;
       button.textContent = "CONTINUAR PARA PAGAMENTO";
