@@ -1,3 +1,52 @@
-<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sacola | TIKTOK-SHOP</title><link rel="stylesheet" href="style.css"><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase.config.js" defer></script><script src="app.js" defer></script><script src="sacola.js" defer></script></head><body>
-<header class="site-header"><a class="brand" href="index.html">TIKTOK-SHOP</a><a class="cart-link" href="sacola.html">Sacola <span id="cart-count">0</span></a></header>
-<main class="container"><h1 class="page-title">Minha sacola</h1><div id="cart-items" class="panel"></div><div class="panel"><h2 id="cart-total">Total: R$ 0,00</h2><p class="notice">O checkout só deve ser usado após configurar o processamento seguro de pagamentos.</p><a class="button button-block" href="checkout.html">Continuar para checkout</a></div></main><footer class="site-footer">Loja independente TIKTOK-SHOP.</footer></body></html>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101014">
+  <title>Minha sacola | TikTok</title>
+
+  <link rel="stylesheet" href="style.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.config.js" defer></script>
+  <script src="app.js" defer></script>
+  <script src="sacola.js" defer></script>
+</head>
+
+<body>
+  <header class="site-header">
+    <a class="brand" href="index.html">TikTok</a>
+
+    <a class="cart-link" href="sacola.html">
+      <span>Sacola</span>
+      <span id="cart-count">0</span>
+    </a>
+  </header>
+
+  <main class="container">
+    <h1 class="page-title">Minha sacola</h1>
+
+    <section id="cart-items" class="panel">
+      <p class="loading">Carregando sua sacola...</p>
+    </section>
+
+    <section class="panel">
+      <h2 id="cart-total">Total: R$ 0,00</h2>
+
+      <p class="notice">
+        Confira o produto, a quantidade e o valor antes de continuar.
+        O pagamento será realizado na próxima etapa.
+      </p>
+
+      <a class="button button-block" href="checkout.html">
+        Continuar para checkout
+      </a>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    TIKTOK-SHOP — Protótipo acadêmico independente.
+  </footer>
+</body>
+</html>
