@@ -1,7 +1,48 @@
+
 <!DOCTYPE html>
-<html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Produto | TIKTOK-SHOP</title><link rel="stylesheet" href="style.css"><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase.config.js" defer></script><script src="produto.js" defer></script></head>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#ffffff">
+  <title>Produto | TIKTOK-SHOP</title>
+  <link rel="stylesheet" href="style.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.config.js" defer></script>
+  <script src="produto.js" defer></script>
+</head>
+
 <body>
-<header class="site-header"><a class="brand" href="index.html">TIKTOK-SHOP</a><a class="cart-link" href="sacola.html">Sacola <span id="cart-count">0</span></a></header>
-<main class="container"><p class="muted" style="margin:18px 0"><a href="index.html">Início</a> / Produto</p><div id="product-detail" class="product-detail"><p>Carregando produto...</p></div><section class="panel"><h2>Descrição</h2><p id="product-description" class="muted">As informações do produto serão exibidas aqui.</p></section></main>
-<footer class="site-footer">Loja independente TIKTOK-SHOP. Não afiliada ao TikTok.</footer>
-<script src="app.js"></script></body></html>
+  <header class="site-header">
+    <a class="brand" href="index.html">TIKTOK-SHOP</a>
+    <a class="cart-link" href="sacola.html">
+      Sacola <span id="cart-count">0</span>
+    </a>
+  </header>
+
+  <main class="container">
+    <p class="muted" style="margin:18px 0">
+      <a href="index.html">Início</a> / Produto
+    </p>
+
+    <div id="product-detail">
+      <p>Carregando produto...</p>
+    </div>
+
+    <section class="panel" style="margin-top:25px">
+      <h2>Descrição do produto</h2>
+      <p id="product-description" class="muted">
+        As informações do produto serão exibidas aqui.
+      </p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    TIKTOK-SHOP — loja independente, sem vínculo com o TikTok.
+    Protótipo demonstrativo: compras e pagamentos reais dependem de configuração.
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
