@@ -5,6 +5,8 @@
   const description = document.getElementById("product-description");
   const id = new URLSearchParams(location.search).get("id");
 
+  if (!root) return;
+
   const money = value =>
     Number(value || 0).toLocaleString("pt-BR", {
       style: "currency",
@@ -45,6 +47,7 @@
 
   document.title = p.name + " | TIKTOK-SHOP";
 
+  // Fotos e vídeos cadastrados no produto
   let media = Array.isArray(p.media) ? p.media : [];
 
   media = media.map(item => ({
@@ -53,7 +56,6 @@
     name: item.name || ""
   })).filter(item => item.url);
 
-  // Compatibilidade com produtos antigos
   if (!media.length && p.image) {
     const oldImage = safeUrl(p.image);
     if (oldImage) {
@@ -65,7 +67,27 @@
     }
   }
 
+  // Até cinco fotos, ou vídeo quando cadastrado
+  const photos = media.filter(item => item.type === "image").slice(0, 5);
+  const videos = media.filter(item => item.type === "video");
+  media = photos.length ? [...photos, ...videos] : videos;
+
+  // Cores disponíveis cadastradas no produto
+  let colors = p.colors || p.available_colors || [];
+
+  if (typeof colors === "string") {
+    colors = colors.split(",").map(c => c.trim()).filter(Boolean);
+  }
+
+  if (!Array.isArray(colors)) colors = [];
+
+  colors = colors.map(item => {
+    if (typeof item === "string") return item;
+    return item.color || item.name || "";
+  }).filter(Boolean);
+
   let current = 0;
+  let selectedColor = colors[0] || "";
 
   const stock = Number(p.stock || 0);
   const price = Number(p.price || 0);
@@ -74,8 +96,18 @@
     <div class="ts-product">
 
       <section class="ts-gallery">
-        <div id="ts-main-media" class="ts-main-media"></div>
+        <div class="ts-main-wrap">
+          <button id="ts-prev" class="ts-arrow ts-prev"
+            type="button" aria-label="Foto anterior">‹</button>
+
+          <div id="ts-main-media" class="ts-main-media"></div>
+
+          <button id="ts-next" class="ts-arrow ts-next"
+            type="button" aria-label="Próxima foto">›</button>
+        </div>
+
         <div id="ts-thumbnails" class="ts-thumbnails"></div>
+        <div id="ts-counter" class="ts-counter"></div>
       </section>
 
       <section class="ts-info">
@@ -85,72 +117,74 @@
 
         <h1>${safe(p.name)}</h1>
 
-        <div class="ts-rating">
-          ★ ${p.rating != null
-            ? Number(p.rating).toFixed(1)
-            : "Produto em destaque"}
-        </div>
+        <div class="ts-rating">★ Produto em destaque</div>
 
-        <div class="ts-current-price">
-          ${money(price)}
-        </div>
+        <div class="ts-current-price">${money(price)}</div>
 
         <p class="ts-stock">
           ${stock > 0
-            ? "Produto disponível em estoque."
-            : "Consulte a disponibilidade."}
+            ? `${stock} unidade(s) disponível(is)`
+            : "Produto sem estoque disponível"}
         </p>
 
         <div class="ts-options">
-          <label for="color">Cor ou variação</label>
-          <input id="color" placeholder="Ex.: Preto">
-
-          <label for="size">Tamanho ou opção</label>
-          <input id="size" placeholder="Ex.: 256 GB">
+          <label>Escolha a cor disponível</label>
+          <div id="ts-colors" class="ts-colors"></div>
+          <p id="ts-selected-color" class="ts-selected-color"></p>
         </div>
 
-        <div class="ts-actions">
-          <button id="ts-add" class="ts-add">
-            ADICIONAR À SACOLA
-          </button>
-
-          <button id="ts-buy" class="ts-buy">
+        <div class="ts-buy-area">
+          <button id="ts-buy" class="ts-buy" type="button">
             COMPRAR
           </button>
+        </div>
+
+        <div class="ts-benefits">
+          <p>✓ Informações do pedido na próxima etapa</p>
+          <p>✓ Acompanhamento do pedido</p>
+          <p>✓ Pagamento pelo fluxo RecargaPay</p>
         </div>
       </section>
     </div>
   `;
 
-  description.textContent =
-    p.description || "Sem descrição cadastrada.";
+  if (description) {
+    description.textContent =
+      p.description || "Sem descrição cadastrada.";
+  }
 
   const main = document.getElementById("ts-main-media");
   const thumbs = document.getElementById("ts-thumbnails");
+  const counter = document.getElementById("ts-counter");
 
   function showMedia(index) {
     if (!media.length) {
-      main.innerHTML = "<div class='ts-no-media'>Mídia não cadastrada</div>";
+      main.innerHTML =
+        "<div class='ts-no-media'>Fotos ou vídeo ainda não cadastrados.</div>";
+      counter.textContent = "";
+      thumbs.innerHTML = "";
       return;
     }
 
-    current = index;
-    const item = media[index];
+    current = (index + media.length) % media.length;
+    const item = media[current];
 
     main.innerHTML = item.type === "video"
       ? `<video src="${safe(item.url)}"
            controls playsinline preload="metadata"></video>`
-      : `<img src="${safe(item.url)}"
-           alt="${safe(p.name)}">`;
+      : `<img src="${safe(item.url)}" alt="${safe(p.name)}">`;
 
     [...thumbs.children].forEach((el, i) => {
-      el.classList.toggle("selected", i === index);
+      el.classList.toggle("selected", i === current);
     });
+
+    counter.textContent = `${current + 1} / ${media.length}`;
   }
 
   thumbs.innerHTML = media.map((item, index) => `
     <button class="ts-thumb ${index === 0 ? "selected" : ""}"
-      data-index="${index}" type="button">
+      data-index="${index}" type="button"
+      aria-label="Ver mídia ${index + 1}">
       ${item.type === "video"
         ? `<span class="ts-video-thumb">▶ VÍDEO</span>`
         : `<img src="${safe(item.url)}" alt="Foto ${index + 1}">`}
@@ -163,34 +197,95 @@
     });
   });
 
+  document.getElementById("ts-prev").onclick = () =>
+    showMedia(current - 1);
+
+  document.getElementById("ts-next").onclick = () =>
+    showMedia(current + 1);
+
   showMedia(0);
 
-  const addItem = () => {
+  // Seleção das cores
+  const colorBox = document.getElementById("ts-colors");
+  const selectedLabel = document.getElementById("ts-selected-color");
+
+  const colorMap = {
+    "preto": "#171717",
+    "black": "#171717",
+    "branco": "#ffffff",
+    "white": "#ffffff",
+    "azul": "#2875c7",
+    "blue": "#2875c7",
+    "rosa": "#e9a4b8",
+    "pink": "#e9a4b8",
+    "dourado": "#c9a34a",
+    "gold": "#c9a34a",
+    "prata": "#c0c0c0",
+    "silver": "#c0c0c0",
+    "titânio": "#88847d",
+    "titanio": "#88847d",
+    "verde": "#39865b",
+    "green": "#39865b",
+    "roxo": "#8060a8",
+    "purple": "#8060a8"
+  };
+
+  if (colors.length) {
+    colorBox.innerHTML = colors.map((color, index) => {
+      const background =
+        colorMap[color.toLowerCase()] || "#dddddd";
+
+      return `
+        <button type="button"
+          class="ts-color ${index === 0 ? "selected" : ""}"
+          data-color="${safe(color)}"
+          aria-label="Selecionar ${safe(color)}"
+          title="${safe(color)}">
+          <span style="background:${background}"></span>
+          <small>${safe(color)}</small>
+        </button>
+      `;
+    }).join("");
+
+    colorBox.querySelectorAll(".ts-color").forEach(button => {
+      button.addEventListener("click", () => {
+        selectedColor = button.dataset.color;
+
+        colorBox.querySelectorAll(".ts-color").forEach(el => {
+          el.classList.toggle("selected", el === button);
+        });
+
+        selectedLabel.textContent = "Cor selecionada: " + selectedColor;
+      });
+    });
+
+    selectedLabel.textContent = "Cor selecionada: " + selectedColor;
+  } else {
+    colorBox.innerHTML =
+      "<p class='ts-no-colors'>Cores ainda não cadastradas.</p>";
+    selectedLabel.textContent = "";
+  }
+
+  // ÚNICO botão de compra
+  document.getElementById("ts-buy").onclick = () => {
     if (stock <= 0) {
       alert("Produto sem estoque disponível.");
-      return false;
+      return;
+    }
+
+    if (colors.length && !selectedColor) {
+      alert("Selecione uma cor.");
+      return;
     }
 
     if (typeof window.addToCart !== "function") {
       alert("A sacola não foi carregada.");
-      return false;
+      return;
     }
 
-    window.addToCart(
-      p,
-      document.getElementById("color").value.trim(),
-      document.getElementById("size").value.trim()
-    );
+    window.addToCart(p, selectedColor, "");
 
-    return true;
-  };
-
-  document.getElementById("ts-add").onclick = addItem;
-
-  document.getElementById("ts-buy").onclick = () => {
-    if (addItem()) {
-      location.href = "sacola.html";
-    }
+    location.href = "sacola.html";
   };
 
   if (typeof window.updateCartCount === "function") {
@@ -206,19 +301,25 @@
       gap:28px;
       max-width:1100px;
       margin:20px auto;
+      padding:16px;
       color:#171717;
     }
 
     .ts-gallery,.ts-info { min-width:0; }
 
-    .ts-main-media {
+    .ts-main-wrap {
+      position:relative;
       background:#111;
       border-radius:12px;
       overflow:hidden;
+    }
+
+    .ts-main-media {
       aspect-ratio:1/1;
       display:flex;
       align-items:center;
       justify-content:center;
+      overflow:hidden;
     }
 
     .ts-main-media img,
@@ -233,16 +334,34 @@
       padding:30px;
     }
 
+    .ts-arrow {
+      position:absolute;
+      z-index:2;
+      top:50%;
+      transform:translateY(-50%);
+      width:38px;
+      height:38px;
+      border:0;
+      border-radius:50%;
+      background:rgba(0,0,0,.65);
+      color:white;
+      font-size:28px;
+      cursor:pointer;
+    }
+
+    .ts-prev { left:10px; }
+    .ts-next { right:10px; }
+
     .ts-thumbnails {
       display:flex;
-      gap:10px;
+      gap:9px;
       margin-top:12px;
       flex-wrap:wrap;
     }
 
     .ts-thumb {
-      width:70px;
-      height:70px;
+      width:65px;
+      height:65px;
       border:2px solid #ddd;
       border-radius:8px;
       overflow:hidden;
@@ -251,9 +370,7 @@
       background:#111;
     }
 
-    .ts-thumb.selected {
-      border-color:#fe2c55;
-    }
+    .ts-thumb.selected { border-color:#fe2c55; }
 
     .ts-thumb img {
       width:100%;
@@ -268,13 +385,20 @@
       justify-content:center;
       width:100%;
       height:100%;
-      font-size:12px;
+      font-size:11px;
       font-weight:bold;
+    }
+
+    .ts-counter {
+      color:#777;
+      font-size:12px;
+      margin-top:8px;
     }
 
     .ts-category {
       color:#777;
       font-size:12px;
+      text-transform:uppercase;
     }
 
     .ts-info h1 {
@@ -282,10 +406,7 @@
       margin:10px 0;
     }
 
-    .ts-rating {
-      color:#d78a00;
-      margin:12px 0;
-    }
+    .ts-rating { color:#d78a00; margin:12px 0; }
 
     .ts-current-price {
       font-size:32px;
@@ -293,54 +414,89 @@
       margin:20px 0;
     }
 
-    .ts-stock {
-      color:#666;
-      font-size:13px;
-    }
+    .ts-stock { color:#666; font-size:13px; }
 
     .ts-options {
       display:grid;
-      gap:8px;
-      margin:20px 0;
-    }
-
-    .ts-options input {
-      padding:12px;
-      border:1px solid #ddd;
-      border-radius:7px;
-    }
-
-    .ts-actions {
-      display:grid;
       gap:10px;
-      grid-template-columns:1fr 1fr;
+      margin:22px 0;
     }
 
-    .ts-actions button {
-      padding:15px 8px;
-      border:0;
-      border-radius:7px;
-      font-weight:bold;
+    .ts-options label { font-weight:700; }
+
+    .ts-colors {
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+    }
+
+    .ts-color {
+      min-width:65px;
+      padding:8px 7px;
+      border:1px solid #ddd;
+      border-radius:9px;
+      background:white;
       cursor:pointer;
+      display:grid;
+      justify-items:center;
+      gap:6px;
     }
 
-    .ts-add {
-      background:#ffe5eb;
-      color:#d90038;
+    .ts-color span {
+      display:block;
+      width:27px;
+      height:27px;
+      border-radius:50%;
+      border:1px solid #aaa;
+    }
+
+    .ts-color.selected {
+      border:2px solid #fe2c55;
+      background:#fff5f7;
+    }
+
+    .ts-color small { font-size:11px; }
+
+    .ts-selected-color {
+      color:#555;
+      font-size:13px;
+    }
+
+    .ts-no-colors {
+      color:#777;
+      font-size:13px;
     }
 
     .ts-buy {
+      width:100%;
+      padding:17px;
+      border:0;
+      border-radius:9px;
       background:#fe2c55;
       color:white;
+      font-size:16px;
+      font-weight:800;
+      cursor:pointer;
+    }
+
+    .ts-buy:hover { background:#df1743; }
+
+    .ts-benefits {
+      margin-top:20px;
+      color:#555;
+      font-size:13px;
+      line-height:1.8;
     }
 
     @media(max-width:700px) {
       .ts-product {
         grid-template-columns:1fr;
         gap:18px;
+        padding:12px;
       }
 
       .ts-info h1 { font-size:21px; }
+      .ts-current-price { font-size:28px; }
     }
   `;
 
